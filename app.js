@@ -1,4 +1,4 @@
-import { encartes, encarteAtivo } from './encartes.js';
+import { encartes, encarteAtivo } from './encartes.js?v=fds-20261107';
 
 const menuButton = document.querySelector('.menu-toggle');
 const menu = document.getElementById('mobile-menu');
