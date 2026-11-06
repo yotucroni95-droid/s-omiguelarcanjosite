@@ -7,3 +7,39 @@
 /* Fotos dos setores enviadas pela loja. */
 .department.photo-card { color: white; }
 .grocery.photo-card img { object-position: 45% center; }
+
+/* Vermelho em destaque, preto nas áreas de apoio e branco para leitura. */
+body { background: #a80f20; color: #fff7f2; }
+header { background: #171315; border-bottom-color: #ffffff20; }
+header .brand, header nav a { color: #fff7f2; }
+header nav a:hover { color: #ffb9bf; }
+.menu-toggle { border-color: #ffffff60; }
+.menu-toggle span { background: #fff7f2; }
+#mobile-menu { background: #211719; color: #fff7f2; border-bottom-color: #ffffff25; }
+#mobile-menu a:hover { color: #ffb9bf; }
+.hero { background: linear-gradient(120deg, #ba1528, #8b0c1b); }
+.hero .eyebrow, .hero em { color: #fff7f2; }
+.hero .dot { background: #fff7f2; }
+.hero-intro, .hero-note { color: #f7dadd; }
+.hero-note { border-top-color: #ffffff35; }
+.hero-note strong { color: #fff7f2; }
+.hero .button.red { background: #fff7f2; color: #9d1020; }
+.ticker { background: #171315; }
+.departments { background: #a80f20; }
+.departments .eyebrow, .departments em { color: #fff7f2; }
+.departments .section-heading > p, .departments .photo-note { color: #f5d8dc; }
+.offers { background: #191416; }
+.offers-heading .eyebrow { color: #ffadb7; }
+.offers-heading em { color: #ffb6bf; }
+.offers-panel { color: #2e211e; background: #fffaf6; }
+.about { background: #850d1b; }
+.about-copy .eyebrow, .about-copy em { color: #fff7f2; }
+.about-copy > p:not(.eyebrow), .about-line span { color: #f2d4d8; }
+.about-line { border-color: #ffffff30; }
+.about-line strong { color: #fff7f2; }
+.about-images > img:nth-child(2) { border-color: #850d1b; }
+.mascot-section { background: #ba1528; }
+.visit { background: #fff7f2; color: #2e211e; }
+.social-strip { background: #a80f20; color: #fff7f2; }
+.social-strip a { color: #fff7f2; }
+footer { background: #171315; }
