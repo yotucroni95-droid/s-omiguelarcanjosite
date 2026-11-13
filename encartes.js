@@ -1,11 +1,18 @@
-// Exibição no horário de Pernambuco; a arte informa ofertas para 11/11.
+// Validade no horário de Pernambuco (-03:00).
 export const encartes = [
   {
-    "id": "esquenta-2026-11-11",
-    "titulo": "Esquenta Black Friday — ofertas para 11 de novembro",
-    "imagem": "assets/encartes/esquenta-2026-11-11.jpg",
-    "inicio": "2026-11-10T18:00:00-03:00",
-    "fim": "2026-11-11T23:00:00-03:00"
+    "id": "fds-2026-11-13-1",
+    "titulo": "FDS do Esquenta Black Friday — 13, 14 e 15 de novembro — página 1",
+    "imagem": "assets/encartes/fds-2026-11-13-1.jpg",
+    "inicio": "2026-11-13T00:00:00-03:00",
+    "fim": "2026-11-16T00:00:00-03:00"
+  },
+  {
+    "id": "fds-2026-11-13-2",
+    "titulo": "FDS do Esquenta Black Friday — 13, 14 e 15 de novembro — página 2",
+    "imagem": "assets/encartes/fds-2026-11-13-2.jpg",
+    "inicio": "2026-11-13T00:00:00-03:00",
+    "fim": "2026-11-16T00:00:00-03:00"
   }
 ];
 
