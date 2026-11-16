@@ -1,78 +1,221 @@
-import { encartes, encarteAtivo } from './encartes.js?v=fds-20261112-agora';
+import { encartes, encarteAtivo } from './encartes.js?v=20261116';
 
-const menuButton = document.querySelector('.menu-toggle');
-const menu = document.getElementById('mobile-menu');
-menuButton.addEventListener('click', () => {
-  const aberto = menuButton.getAttribute('aria-expanded') === 'true';
-  menuButton.setAttribute('aria-expanded', String(!aberto));
-  menuButton.setAttribute('aria-label', aberto ? 'Abrir menu' : 'Fechar menu');
-  menu.hidden = aberto;
-});
-menu.addEventListener('click', event => {
-  if (event.target.closest('a')) {
-    menu.hidden = true;
-    menuButton.setAttribute('aria-expanded', 'false');
-    menuButton.setAttribute('aria-label', 'Abrir menu');
-  }
-});
+const $ = (s, el = document) => el.querySelector(s);
+const FUSO = 'America/Recife';
+const ABRE = 6, FECHA = 19;
 
-const painel = document.getElementById('flyers');
-const lista = document.getElementById('flyer-list');
-const dialog = document.getElementById('flyer-dialog');
-let encarteAberto = null;
-let ultimaLista = null;
-const formatoData = new Intl.DateTimeFormat('pt-BR', {
-  timeZone: 'America/Recife', dateStyle: 'short', timeStyle: 'short'
-});
+// Para conferir um encarte programado antes da data: ?simular=2026-11-14T10:00
+const simulado = (() => {
+  const p = new URLSearchParams(location.search).get('simular');
+  const t = p ? Date.parse(p.length <= 16 ? p + ':00-03:00' : p) : NaN;
+  return Number.isFinite(t) ? t - Date.now() : 0;
+})();
+const agora = () => Date.now() + simulado;
 
-function abrirEncarte(encarte) {
-  if (!encarteAtivo(encarte)) {
-    atualizarEncartes();
+/* ---------- topo fica sólido ao rolar ---------- */
+const topo = $('#topo');
+const marcarTopo = () => topo.classList.toggle('solid', scrollY > 30);
+addEventListener('scroll', marcarTopo, { passive: true });
+marcarTopo();
+
+/* ---------- aberto ou fechado agora ---------- */
+const horaRecife = new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
+function atualizarStatus() {
+  const [h, m] = horaRecife.format(agora()).split(':').map(Number);
+  const min = h * 60 + m;
+  const aberto = min >= ABRE * 60 && min < FECHA * 60;
+  const falta = FECHA * 60 - min;
+  const txt = aberto
+    ? (falta <= 60 ? `Aberto agora · fecha em ${falta} min` : 'Aberto agora · até as 19h')
+    : (min < ABRE * 60 ? 'Fechado agora · abre às 6h' : 'Fechado agora · abre amanhã às 6h');
+  const st = $('[data-status]');
+  st.classList.toggle('aberto', aberto);
+  st.classList.toggle('fechado', !aberto);
+  $('[data-status-txt]').textContent = txt;
+  const card = $('[data-status-card]');
+  card.textContent = aberto ? 'Aberto agora.' : (min < ABRE * 60 ? 'Fechado agora. Abre às 6h.' : 'Fechado agora. Abre amanhã às 6h.');
+  card.classList.toggle('aberto', aberto);
+  card.classList.toggle('fechado', !aberto);
+}
+
+/* ---------- encarte ---------- */
+const dia = new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, weekday: 'long', day: '2-digit', month: '2-digit' });
+const hora = new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: '2-digit', minute: '2-digit' });
+const nomeCampanha = t => t.replace(/\s*[—-]\s*p[áa]gina\s*\d+\s*$/i, '').trim();
+
+let assinatura = null;
+let fimAtual = 0;
+let observadorPaginas = null;
+
+function textoValidade(fim) {
+  // fim à meia-noite = vale o dia anterior inteiro
+  const ultimo = new Date(fim - 1);
+  const meiaNoite = hora.format(new Date(fim)) === '00:00';
+  return meiaNoite ? `Válido até ${dia.format(ultimo)}` : `Válido até ${dia.format(ultimo)}, ${hora.format(new Date(fim))}`;
+}
+
+function atualizarContagem() {
+  const el = $('[data-countdown]');
+  if (!fimAtual) { el.textContent = ''; return; }
+  let s = Math.max(0, Math.floor((fimAtual - agora()) / 1000));
+  const d = Math.floor(s / 86400); s -= d * 86400;
+  const h = Math.floor(s / 3600); s -= h * 3600;
+  const m = Math.floor(s / 60); s -= m * 60;
+  const p = n => String(n).padStart(2, '0');
+  el.textContent = d > 0 ? `Termina em ${d}d ${p(h)}h ${p(m)}min` : `Termina em ${p(h)}:${p(m)}:${p(s)}`;
+}
+
+function renderEncartes() {
+  const ativos = encartes.filter(e => encarteAtivo(e, agora()));
+  const chave = ativos.map(e => e.id).join('|');
+  if (chave === assinatura) return;
+  assinatura = chave;
+  if ($('#visor').open && !ativos.length) fecharVisor();
+
+  const tem = ativos.length > 0;
+  $('[data-encarte]').hidden = !tem;
+  $('[data-sem-encarte]').hidden = tem;
+  $('[data-validade]').hidden = !tem;
+  $('[data-hero-cta-txt]').textContent = tem ? 'Ver o encarte da semana' : 'Ver as novidades';
+  $('[data-cta-ofertas]').classList.toggle('pulse', tem);
+
+  const paginas = $('[data-paginas]');
+  const nav = $('[data-paginas-nav]');
+  paginas.replaceChildren();
+  nav.replaceChildren();
+  observadorPaginas?.disconnect();
+  fimAtual = 0;
+
+  if (!tem) {
+    $('[data-ofertas-titulo]').textContent = 'Ofertas da semana';
+    atualizarContagem();
     return;
   }
-  encarteAberto = encarte;
-  document.getElementById('flyer-dialog-title').textContent = encarte.titulo;
-  const imagem = document.getElementById('flyer-image');
-  imagem.src = encarte.imagem;
-  imagem.alt = encarte.titulo;
-  document.getElementById('flyer-validity').textContent = `Válido até ${formatoData.format(new Date(encarte.fim))} (horário de Pernambuco).`;
-  document.getElementById('flyer-original').href = encarte.imagem;
-  dialog.showModal();
-  document.body.classList.add('dialog-open');
+
+  fimAtual = Math.min(...ativos.map(e => Date.parse(e.fim)));
+  const campanhas = [...new Set(ativos.map(e => nomeCampanha(e.titulo).split(/\s+[—–]\s+/)[0]))];
+  $('[data-ofertas-titulo]').textContent = campanhas.length === 1 && campanhas[0].length <= 40 ? campanhas[0] : 'Ofertas da semana';
+  $('[data-validade-txt]').textContent = textoValidade(fimAtual);
+  atualizarContagem();
+  paginas.classList.toggle('uma', ativos.length === 1);
+  nav.hidden = ativos.length < 2;
+
+  ativos.forEach((e, i) => {
+    const fig = document.createElement('figure');
+    fig.className = 'pagina';
+    fig.id = `encarte-${i + 1}`;
+    const img = document.createElement('img');
+    img.src = e.imagem;
+    img.alt = e.titulo;
+    img.decoding = 'async';
+    if (i > 0) img.loading = 'lazy';
+    img.addEventListener('load', () => fig.style.setProperty('--ar', `${img.naturalWidth}/${img.naturalHeight}`), { once: true });
+    img.addEventListener('dblclick', () => abrirVisor(e));
+    fig.append(img);
+    if (ativos.length > 1) {
+      const n = document.createElement('span');
+      n.className = 'pagina-n';
+      n.textContent = `Página ${i + 1} de ${ativos.length}`;
+      fig.append(n);
+    }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ampliar';
+    b.innerHTML = '<svg class="icon"><use href="#expand"/></svg>Tela cheia';
+    b.setAttribute('aria-label', `Ver ${e.titulo} em tela cheia`);
+    b.addEventListener('click', () => abrirVisor(e));
+    fig.append(b);
+    paginas.append(fig);
+
+    const nb = document.createElement('button');
+    nb.type = 'button';
+    nb.textContent = `Página ${i + 1}`;
+    nb.addEventListener('click', () => fig.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    nav.append(nb);
+  });
+
+  // marca a página que está na tela e faz cada uma aparecer ao rolar
+  const botoes = [...nav.children];
+  observadorPaginas = new IntersectionObserver(entradas => {
+    for (const en of entradas) {
+      if (en.isIntersecting) en.target.classList.add('visto');
+      if (en.isIntersecting && en.intersectionRatio > 0.25) {
+        const i = [...paginas.children].indexOf(en.target);
+        botoes.forEach((b, j) => b.setAttribute('aria-current', String(i === j)));
+      }
+    }
+  }, { threshold: [0, 0.25, 0.5], rootMargin: '0px 0px -10% 0px' });
+  [...paginas.children].forEach(f => observadorPaginas.observe(f));
+  botoes[0]?.setAttribute('aria-current', 'true');
 }
 
-function atualizarEncartes() {
-  if (encarteAberto && !encarteAtivo(encarteAberto)) dialog.close();
-  const ativos = encartes.filter(encarte => encarteAtivo(encarte));
-  const assinatura = JSON.stringify(ativos);
-  if (assinatura === ultimaLista) return;
-  ultimaLista = assinatura;
-  painel.hidden = ativos.length === 0;
-  lista.replaceChildren();
-  for (const encarte of ativos) {
-    const button = document.createElement('button');
-    button.className = 'flyer-button';
-    button.type = 'button';
-    const imagem = document.createElement('img');
-    imagem.src = encarte.imagem;
-    imagem.alt = encarte.titulo;
-    imagem.loading = 'lazy';
-    const texto = document.createElement('span');
-    texto.textContent = `${encarte.titulo} — toque para ampliar. Válido até ${formatoData.format(new Date(encarte.fim))}.`;
-    button.append(imagem, texto);
-    button.addEventListener('click', () => abrirEncarte(encarte));
-    lista.append(button);
-  }
+/* ---------- tela cheia com zoom ---------- */
+const visor = $('#visor');
+const area = $('[data-visor-area]');
+function abrirVisor(e) {
+  $('[data-visor-img]').src = e.imagem;
+  $('[data-visor-img]').alt = e.titulo;
+  $('[data-visor-titulo]').textContent = nomeCampanha(e.titulo).split(/\s+[—–]\s+/)[0] +(/\d+\s*$/.test(e.titulo) ? ` · pág. ${e.titulo.match(/(\d+)\s*$/)[1]}` : '');
+  area.classList.remove('zoom');
+  area.scrollTo(0, 0);
+  visor.showModal();
+  document.body.classList.add('travado');
 }
-
-document.getElementById('close-flyer').addEventListener('click', () => dialog.close());
-dialog.addEventListener('close', () => {
-  encarteAberto = null;
-  document.body.classList.remove('dialog-open');
-  document.getElementById('flyer-image').removeAttribute('src');
+function fecharVisor() { if (visor.open) visor.close(); }
+$('[data-visor-fechar]').addEventListener('click', fecharVisor);
+visor.addEventListener('close', () => { document.body.classList.remove('travado'); $('[data-visor-img]').removeAttribute('src'); });
+let ultimoToque = 0;
+function alternarZoom(x, y) {
+  const r = area.getBoundingClientRect();
+  const fx = (x - r.left + area.scrollLeft) / area.scrollWidth;
+  const fy = (y - r.top + area.scrollTop) / area.scrollHeight;
+  area.classList.toggle('zoom');
+  requestAnimationFrame(() => setTimeout(() => {
+    area.scrollTo(fx * area.scrollWidth - r.width / 2, fy * area.scrollHeight - r.height / 2);
+  }, 260));
+}
+area.addEventListener('dblclick', ev => alternarZoom(ev.clientX, ev.clientY));
+area.addEventListener('touchend', ev => {
+  if (ev.changedTouches.length !== 1 || ev.touches.length) return;
+  const t = Date.now();
+  if (t - ultimoToque < 300) { ev.preventDefault(); const p = ev.changedTouches[0]; alternarZoom(p.clientX, p.clientY); ultimoToque = 0; }
+  else ultimoToque = t;
 });
-atualizarEncartes();
-setInterval(atualizarEncartes, 1000);
-window.addEventListener('pageshow', atualizarEncartes);
-document.addEventListener('visibilitychange', atualizarEncartes);
-document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- mandar o encarte ---------- */
+$('[data-compartilhar]').addEventListener('click', async () => {
+  const url = location.origin + location.pathname + '#ofertas';
+  const texto = 'Olha as ofertas do São Miguel Arcanjo!';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Encarte São Miguel Arcanjo', text: texto, url }); return; }
+    catch (err) { if (err && err.name === 'AbortError') return; }
+  }
+  open('https://wa.me/?text=' + encodeURIComponent(`${texto} ${url}`), '_blank', 'noopener');
+});
+
+/* ---------- setores: bolinhas acompanham o deslize ---------- */
+const trilho = $('[data-trilho]');
+const dots = [...$('[data-trilho-dots]').children];
+trilho.addEventListener('scroll', () => {
+  const cards = [...trilho.children];
+  const meio = trilho.scrollLeft + trilho.clientWidth / 2;
+  let i = 0, menor = Infinity;
+  cards.forEach((c, j) => { const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - meio); if (d < menor) { menor = d; i = j; } });
+  dots.forEach((d, j) => d.classList.toggle('on', j === i));
+}, { passive: true });
+dots[0]?.classList.add('on');
+
+/* ---------- aparecer ao rolar ---------- */
+const obs = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); }
+}), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* ---------- ciclo ---------- */
+function tique() { renderEncartes(); atualizarStatus(); }
+tique();
+setInterval(atualizarContagem, 1000);
+setInterval(tique, 20000);
+addEventListener('pageshow', tique);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) tique(); });
+$('#ano').textContent = new Date(agora()).getFullYear();
