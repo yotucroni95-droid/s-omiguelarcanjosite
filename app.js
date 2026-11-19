@@ -1,4 +1,4 @@
-import { encartes, encarteAtivo } from './encartes.js?v=20261116';
+import { encartes, encarteAtivo } from './encartes.js?v=20261119';
 
 const $ = (s, el = document) => el.querySelector(s);
 const FUSO = 'America/Recife';
