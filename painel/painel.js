@@ -19,7 +19,7 @@ function aviso(texto, tipo = 'ok') {
 async function iniciar() {
   try {
     const {createClient} = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm');
-    sb = createClient(banco.url, banco.chave, {auth: {persistSession: true, detectSessionInUrl: false, storageKey: 'smiguel-painel'}});
+    sb = createClient(banco.url, banco.chave, {auth: {persistSession: true, detectSessionInUrl: false, storageKey: 'orbita-sites-sessao'}});
   } catch { app.innerHTML = '<div class="caixa"><p class="erro">Não foi possível carregar. Verifique a internet e recarregue a página.</p></div>'; return; }
   const {data} = await sb.auth.getSession();
   if (data.session) await entrou(data.session); else telaLogin();
@@ -45,7 +45,12 @@ async function entrou(sessao) {
   const minhas = (await sb.from('equipe').select('site,papel')).data || [];
   orbita = minhas.some(r => r.site === '*');
   const aqui = minhas.find(r => r.site === SITE);
-  if (!orbita && !aqui) { await sb.auth.signOut(); return telaLogin('Este usuário não tem acesso a este site.'); }
+  if (!orbita && !aqui) {
+    // A sessão é a mesma em todos os painéis da Órbita: não desloga, só oferece trocar de usuário.
+    app.innerHTML = '<div class="caixa login"><h1>Sem acesso a este site</h1><p class="nota">O usuário ' + esc(mostrarUsuario(email)) + ' não tem permissão para editar o São Miguel Arcanjo.</p><button class="bt principal" data-trocar>Entrar com outro usuário</button></div>';
+    app.querySelector('[data-trocar]').onclick = async () => { await sb.auth.signOut(); telaLogin(); };
+    return;
+  }
   dono = orbita || aqui?.papel === 'dono';
   quem.innerHTML = '<span>' + esc(mostrarUsuario(email)) + '</span><button class="bt" data-sair>Sair</button>';
   quem.querySelector('[data-sair]').onclick = async () => { await sb.auth.signOut(); telaLogin(); };
