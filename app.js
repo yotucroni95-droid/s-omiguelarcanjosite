@@ -1,8 +1,10 @@
-import { encartes, encarteAtivo } from './encartes.js?v=20261119';
+import { encartes, encarteAtivo } from './encartes.js?v=20261124';
+import { horario, atualizarDoBanco } from './remoto.js?v=20261124';
 
 const $ = (s, el = document) => el.querySelector(s);
 const FUSO = 'America/Recife';
-const ABRE = 6, FECHA = 19;
+// Horário vem do painel do dono (remoto.js); padrão 6h às 19h.
+const ABRE_ = () => horario.abre, FECHA_ = () => horario.fecha;
 
 // Para conferir um encarte programado antes da data: ?simular=2026-11-14T10:00
 const simulado = (() => {
@@ -23,17 +25,17 @@ const horaRecife = new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: 'num
 function atualizarStatus() {
   const [h, m] = horaRecife.format(agora()).split(':').map(Number);
   const min = h * 60 + m;
-  const aberto = min >= ABRE * 60 && min < FECHA * 60;
-  const falta = FECHA * 60 - min;
+  const aberto = min >= ABRE_() * 60 && min < FECHA_() * 60;
+  const falta = FECHA_() * 60 - min;
   const txt = aberto
-    ? (falta <= 60 ? `Aberto agora · fecha em ${falta} min` : 'Aberto agora · até as 19h')
-    : (min < ABRE * 60 ? 'Fechado agora · abre às 6h' : 'Fechado agora · abre amanhã às 6h');
+    ? (falta <= 60 ? `Aberto agora · fecha em ${falta} min` : `Aberto agora · até as ${FECHA_()}h`)
+    : (min < ABRE_() * 60 ? `Fechado agora · abre às ${ABRE_()}h` : `Fechado agora · abre amanhã às ${ABRE_()}h`);
   const st = $('[data-status]');
   st.classList.toggle('aberto', aberto);
   st.classList.toggle('fechado', !aberto);
   $('[data-status-txt]').textContent = txt;
   const card = $('[data-status-card]');
-  card.textContent = aberto ? 'Aberto agora.' : (min < ABRE * 60 ? 'Fechado agora. Abre às 6h.' : 'Fechado agora. Abre amanhã às 6h.');
+  card.textContent = aberto ? 'Aberto agora.' : (min < ABRE_() * 60 ? `Fechado agora. Abre às ${ABRE_()}h.` : `Fechado agora. Abre amanhã às ${ABRE_()}h.`);
   card.classList.toggle('aberto', aberto);
   card.classList.toggle('fechado', !aberto);
 }
@@ -212,8 +214,14 @@ const obs = new IntersectionObserver(es => es.forEach(e => {
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
 /* ---------- ciclo ---------- */
+// Textos com o horário (ex.: "das 6h às 19h") acompanham o que o dono salvou no painel.
+function textosHorario() {
+  document.querySelectorAll('[data-horario]').forEach(el => { el.textContent = el.dataset.horario.replace('{abre}', horario.abre).replace('{fecha}', horario.fecha); });
+}
 function tique() { renderEncartes(); atualizarStatus(); }
+textosHorario();
 tique();
+atualizarDoBanco().then(mudou => { if (mudou) { assinatura = null; textosHorario(); tique(); } });
 setInterval(atualizarContagem, 1000);
 setInterval(tique, 20000);
 addEventListener('pageshow', tique);

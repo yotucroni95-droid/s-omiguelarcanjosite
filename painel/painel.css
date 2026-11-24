@@ -1,0 +1,38 @@
+:root{--fundo:#f7f3ef;--cartao:#fff;--tinta:#1d0b0d;--suave:#6b5a5c;--linha:#e6dcd5;--red:#d3122a;--red2:#a50d20;--yellow:#ffd21f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--tinta);font:400 15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}
+h1,h2,h3{margin:0;line-height:1.2}h1{font-size:24px}h2{font-size:19px}h3{font-size:16px}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;background:#120708;color:#fff;position:sticky;top:0;z-index:5}
+.marca{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font-weight:600}.marca img{border-radius:50%}.marca b{color:var(--yellow)}
+#quem{display:flex;align-items:center;gap:10px;font-size:13px;color:#d9c9c9}
+main{max-width:900px;margin:0 auto;padding:20px 16px 70px;display:grid;gap:18px}
+.caixa{background:var(--cartao);border:1px solid var(--linha);border-radius:14px;padding:20px;display:grid;gap:14px}
+.login{max-width:420px;width:100%;margin:30px auto}.login img{justify-self:center;border-radius:50%}
+label{display:grid;gap:6px;font-size:13px;font-weight:600}
+input,select{font:400 16px system-ui,sans-serif;padding:11px 12px;border:1px solid var(--linha);border-radius:9px;background:#fffdfb;color:var(--tinta);width:100%}
+input:focus,select:focus{outline:2px solid var(--red);border-color:transparent}
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:9px;border:1px solid var(--linha);background:#fff;color:var(--tinta);font:600 14px system-ui,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.bt:hover{border-color:var(--red)}.bt.principal{background:var(--red);border-color:var(--red);color:#fff}.bt.principal:hover{background:var(--red2)}.bt.perigo{color:var(--red2)}
+.bt[disabled]{opacity:.6;cursor:wait}
+.topo .bt{min-height:36px;background:transparent;color:#fff;border-color:#ffffff40}
+.nota{color:var(--suave);font-size:13px;margin:0}.erro{background:#fdeceb;color:#9a1b1b;padding:10px 12px;border-radius:8px;margin:0}
+.abas{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--linha);scrollbar-width:none}
+.abas button{background:none;border:0;border-bottom:3px solid transparent;padding:12px 10px;font:600 14px system-ui,sans-serif;color:var(--suave);cursor:pointer;white-space:nowrap}
+.abas button[aria-selected=true]{color:var(--tinta);border-bottom-color:var(--red)}
+.dois{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.campanhas{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.campanha{background:var(--cartao);border:1px solid var(--linha);border-radius:14px;padding:16px;display:grid;gap:12px}
+.campanha-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.selo{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:#eee}
+.selo.no-ar{background:#dff5e3;color:#14632a}.selo.agendado{background:#fff3c4;color:#6b5200}.selo.terminou{background:#eee;color:#666}
+.paginas{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.paginas figure{margin:0;flex:0 0 auto;display:grid;gap:4px;justify-items:center}
+.paginas img{width:110px;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--linha);background:#f3eee9}
+.paginas small{font-size:12px;color:var(--suave)}
+.previa{display:flex;gap:8px;flex-wrap:wrap}.previa img{width:80px;height:110px;object-fit:cover;border-radius:6px;border:1px solid var(--linha)}
+.pessoas{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.pessoas li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid var(--linha);border-radius:10px;padding:10px 12px}
+.pessoas li>div:last-child{display:flex;gap:6px;flex-wrap:wrap}.pessoas small{display:block;color:var(--suave);font-size:12.5px}
+.aviso{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;background:#120708;color:#fff;padding:12px 18px;border-radius:10px;font:600 14px system-ui,sans-serif;z-index:50;transition:.3s;pointer-events:none;max-width:90vw}
+.aviso.mostra{opacity:1;transform:translate(-50%,0)}.aviso[data-tipo=erro]{background:var(--red2)}
+@media (max-width:560px){.dois{grid-template-columns:1fr}#quem span{display:none}}

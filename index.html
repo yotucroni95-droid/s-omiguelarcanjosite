@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=20261119">
 <script>document.documentElement.classList.add('js')</script>
-<script type="module" src="app.js?v=20261119"></script>
+<script type="module" src="app.js?v=20261124"></script>
 </head>
 <body>
 <svg class="svg-defs" aria-hidden="true"><defs>
@@ -156,7 +156,7 @@
     <p>Aqui a conversa acontece no balcão, a escolha passa pelo cuidado e a economia faz parte da compra.</p>
     <ul class="selos">
       <li><b>7 dias</b><span>por semana</span></li>
-      <li><b>6h–19h</b><span>abre cedinho</span></li>
+      <li><b data-horario="{abre}h–{fecha}h">6h–19h</b><span>abre cedinho</span></li>
       <li><b>4 setores</b><span>numa compra só</span></li>
     </ul>
   </div>
@@ -183,7 +183,7 @@
     <div class="card reveal">
       <svg class="icon"><use href="#clock"/></svg>
       <small>Horário</small>
-      <h3>Todos os dias, das 6h às 19h</h3>
+      <h3 data-horario="Todos os dias, das {abre}h às {fecha}h">Todos os dias, das 6h às 19h</h3>
       <p class="card-status" data-status-card>De segunda a domingo.</p>
     </div>
     <a class="card reveal" href="https://www.google.com/maps/search/?api=1&query=Supermercado%20e%20Frigor%C3%ADfico%20S%C3%A3o%20Miguel%20Arcanjo%20Rua%20do%20Progresso%20Lagoa%20do%20Ouro%20PE" target="_blank" rel="noopener noreferrer">
