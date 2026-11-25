@@ -1,5 +1,5 @@
-import { encartes, encarteAtivo } from './encartes.js?v=encarte-20261125';
-import { horario, atualizarDoBanco } from './remoto.js?v=encarte-20261125';
+import { encartes, encarteAtivo } from './encartes.js?v=encarte-20261125b';
+import { horario, atualizarDoBanco } from './remoto.js?v=encarte-20261125b';
 
 const $ = (s, el = document) => el.querySelector(s);
 const FUSO = 'America/Recife';

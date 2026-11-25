@@ -1,7 +1,7 @@
 // Encartes e horário editados pelo painel do dono (painel/). Ficam no banco "Órbita Sites".
 // Sem banco ou sem resposta, o site usa a última cópia salva no aparelho ou o encartes.js.
-import {banco} from './config.js?v=encarte-20261125';
-import {encartes} from './encartes.js?v=encarte-20261125';
+import {banco} from './config.js?v=encarte-20261125b';
+import {encartes} from './encartes.js?v=encarte-20261125b';
 
 const CACHE = 'smiguel-remoto';
 export const horario = {abre: 6, fecha: 19};
