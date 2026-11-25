@@ -1,5 +1,5 @@
-import { encartes, encarteAtivo } from './encartes.js?v=20261124';
-import { horario, atualizarDoBanco } from './remoto.js?v=20261124';
+import { encartes, encarteAtivo } from './encartes.js?v=encarte-20261125';
+import { horario, atualizarDoBanco } from './remoto.js?v=encarte-20261125';
 
 const $ = (s, el = document) => el.querySelector(s);
 const FUSO = 'America/Recife';
@@ -223,7 +223,7 @@ textosHorario();
 tique();
 atualizarDoBanco().then(mudou => { if (mudou) { assinatura = null; textosHorario(); tique(); } });
 setInterval(atualizarContagem, 1000);
-setInterval(tique, 20000);
+setInterval(tique, 1000);
 addEventListener('pageshow', tique);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tique(); });
 $('#ano').textContent = new Date(agora()).getFullYear();
