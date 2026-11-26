@@ -1,18 +1,18 @@
-// Exibição no horário de Pernambuco (-03:00). Ofertas para 25/11.
+// Exibição até o fim do domingo, no horário de Pernambuco (-03:00).
 export const encartes = [
   {
-    "id": "quarta-2026-11-25-1",
-    "titulo": "Esquenta da Black Friday — 25 de novembro — página 1",
-    "imagem": "assets/encartes/quarta-2026-11-25-1.jpg",
-    "inicio": "2026-11-24T00:00:00-03:00",
-    "fim": "2026-11-26T00:00:00-03:00"
+    "id": "fds-2026-11-27-1",
+    "titulo": "FDS de Ofertas Arrasadoras — 27, 28 e 29 de novembro — página 1",
+    "imagem": "assets/encartes/fds-2026-11-27-1.jpg",
+    "inicio": "2026-11-26T00:00:00-03:00",
+    "fim": "2026-11-30T00:00:00-03:00"
   },
   {
-    "id": "quarta-2026-11-25-2",
-    "titulo": "Esquenta da Black Friday — 25 de novembro — página 2",
-    "imagem": "assets/encartes/quarta-2026-11-25-2.jpg",
-    "inicio": "2026-11-24T00:00:00-03:00",
-    "fim": "2026-11-26T00:00:00-03:00"
+    "id": "fds-2026-11-27-2",
+    "titulo": "FDS de Ofertas Arrasadoras — 27, 28 e 29 de novembro — página 2",
+    "imagem": "assets/encartes/fds-2026-11-27-2.jpg",
+    "inicio": "2026-11-26T00:00:00-03:00",
+    "fim": "2026-11-30T00:00:00-03:00"
   }
 ];
 

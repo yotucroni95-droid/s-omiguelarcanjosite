@@ -1,7 +1,7 @@
 // Painel do São Miguel Arcanjo: o dono e a equipe entram com usuário e senha e trocam encartes e horário.
 // Os dados vão para o banco "Órbita Sites" (site 'sao-miguel'). As regras do banco só deixam a equipe deste site alterar.
-import {banco} from '../config.js?v=encarte-20261125b';
-import {encartes as encartesArquivo} from '../encartes.js?v=encarte-20261125b';
+import {banco} from '../config.js?v=encarte-20261127';
+import {encartes as encartesArquivo} from '../encartes.js?v=encarte-20261127';
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const slug = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'encarte';
